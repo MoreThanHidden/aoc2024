@@ -6,28 +6,20 @@ pub fn day3_part1() {
     let mut file = File::open("day3.txt").unwrap();
     let mut input = String::new();
     file.read_to_string(&mut input).unwrap();
-    
+
     let sum = test_muls(input);
-    
+
     println!("Day 3 Part 1: {}", sum);
 }
 
 fn test_muls (input: String) -> i32 {
     let mut sum = 0;
-    let input: Vec<&str> = input.split("mul(").collect();
-    for i in 0..input.len() {
-        if input[i].contains(")") {
-            let temp2: Vec<&str> = input[i].split(")").collect();
-            if input[i].contains(",") {
-                let temp3: Vec<&str> = temp2[0].split(",").collect();
-                //check if the length is 2
-                if(temp3.len() == 2) {
-                    //check if the two values are numbers
-                    let x = temp3[0].parse::<i32>();
-                    let y = temp3[1].parse::<i32>();
-                    if x.is_ok() && y.is_ok() {
-                        sum += x.unwrap() * y.unwrap();
-                    }
+    let muls = input.split("mul(").skip(1);
+    for mul in muls {
+        if let Some((args, _)) = mul.split_once(")") {
+            if let Some((x, y)) = args.split_once(",") {
+                if let (Ok(x), Ok(y)) = (x.trim().parse::<i32>(), y.trim().parse::<i32>()) {
+                    sum += x * y;
                 }
             }
         }
@@ -40,7 +32,7 @@ pub fn day3_part2() {
     let mut file = File::open("day3.txt").unwrap();
     let mut input = String::new();
     file.read_to_string(&mut input).unwrap();
-    
+
     let mut sum = 0;
     // The do() instruction enables future mul instructions.
     // The don't() instruction disables future mul instructions.
@@ -49,6 +41,6 @@ pub fn day3_part2() {
         let donts: Vec<&str> = dos[i].split("don't()").collect();
         sum += test_muls(donts[0].to_string());
     }
-    
+
     println!("Day 3 Part 2: {}", sum);
 }
